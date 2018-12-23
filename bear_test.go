@@ -62,6 +62,14 @@ Content
 `)).Tags, []string{"tag1", "tag2"})
 }
 
+func TestTagsInContent(t *testing.T) {
+	assert.Equal(t, NewNote(strings.NewReader(`
+# Title
+#tag1
+#tag2 https://example.tld/path/to/file#slides=1,2,3 #tag3 some string #tag4
+`)).Tags, []string{"tag1", "tag2", "tag3", "tag4"})
+}
+
 func TestLinks(t *testing.T) {
 	assert.Equal(t, NewNote(strings.NewReader(`
 # Title

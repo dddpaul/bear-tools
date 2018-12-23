@@ -23,7 +23,7 @@ func NewNote(r io.Reader) *Note {
 	links := make([]string, 0)
 	tags := make([]string, 0)
 
-	tagsRegexp := regexp.MustCompile(`#[^\s]+`)
+	tagsRegexp := regexp.MustCompile(`(^|\s)#[^\s]+`)
 	linksRegexp := regexp.MustCompile(`\[\[([^]]+)]]`)
 
 	scanner := bufio.NewScanner(r)
@@ -44,7 +44,7 @@ func NewNote(r io.Reader) *Note {
 		if tokens != nil {
 			tmp := tokens[:0]
 			for i, t := range tokens {
-				tokens[i] = strings.Replace(t, "#", "", 1)
+				tokens[i] = strings.Replace(strings.TrimSpace(t), "#", "", 1)
 				if len(tokens[i]) > 0 {
 					tmp = append(tmp, tokens[i])
 				}
@@ -53,11 +53,11 @@ func NewNote(r io.Reader) *Note {
 			continue
 		}
 
-		// Content line with Links optionally
+		// Content line with links optionally
 		tokens = linksRegexp.FindAllString(scanner.Text(), -1)
 		if tokens != nil {
 			for i, t := range tokens {
-				tokens[i] = strings.TrimFunc(t, func(r rune) bool {
+				tokens[i] = strings.TrimFunc(strings.TrimSpace(t), func(r rune) bool {
 					return r == '[' || r == ']'
 				})
 			}
