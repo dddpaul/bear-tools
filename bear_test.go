@@ -70,13 +70,11 @@ func TestTagsInContent(t *testing.T) {
 `)).Tags, []string{"tag1", "tag2", "tag3", "tag4"})
 }
 
-
 func TestMultipleHashesAreNotTags(t *testing.T) {
 	assert.Equal(t, NewNote(strings.NewReader(`
 #tag1 ## ### #### #tag2 ##### #tag3
 `)).Tags, []string{"tag1", "tag2", "tag3"})
 }
-
 
 func TestLinks(t *testing.T) {
 	assert.Equal(t, NewNote(strings.NewReader(`
@@ -85,7 +83,20 @@ func TestLinks(t *testing.T) {
 What's difference between [[Thrift]] and [[GRPC]]
 Or between [[GRPC]] and [[Thrift]] and [[SOAP]]
 Empty Links [[]] should be ignored
-`)).Links, map[string]int{"Thrift": 2, "GRPC": 2, "SOAP": 1})
+`)).Links, []Link{
+		{
+			Title: "Thrift",
+			Count: 2,
+		},
+		{
+			Title: "GRPC",
+			Count: 2,
+		},
+		{
+			Title: "SOAP",
+			Count: 1,
+		},
+	})
 }
 
 func TestMarshal(t *testing.T) {
@@ -95,5 +106,5 @@ func TestMarshal(t *testing.T) {
 	What's difference between [[Thrift]] and [[GRPC]]
 	Or between [[GRPC]] and [[Thrift]] and [[SOAP]]
 	`)).Marshal()
-	assert.Equal(t, json, `{"title":"","tags":["tag1","tag2"],"links":{"GRPC":2,"SOAP":1,"Thrift":2}}`)
+	assert.Equal(t, json, `{"title":"","tags":["tag1","tag2"],"links":[{"title":"Thrift","count":2},{"title":"GRPC","count":2},{"title":"SOAP","count":1}]}`)
 }

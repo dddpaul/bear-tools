@@ -12,10 +12,15 @@ import (
 	"strings"
 )
 
+type Link struct {
+	Title string `json:"title"`
+	Count int    `json:"count"`
+}
+
 type Note struct {
-	Title string         `json:"title"`
-	Tags  []string       `json:"tags"`
-	Links map[string]int `json:"links"`
+	Title string   `json:"title"`
+	Tags  []string `json:"tags"`
+	Links []Link   `json:"links"`
 }
 
 func NewNote(r io.Reader) *Note {
@@ -69,7 +74,7 @@ func NewNote(r io.Reader) *Note {
 	return &Note{
 		Title: title,
 		Tags:  UniqStrings(tags),
-		Links: FreqStrings(links),
+		Links: ToLinks(FreqStrings(links)),
 	}
 }
 
@@ -85,21 +90,18 @@ func (n *Note) Marshal() (string, error) {
 func UniqStrings(input []string) []string {
 	u := make([]string, 0, len(input))
 	m := make(map[string]bool)
-
 	for _, val := range input {
 		if _, ok := m[val]; !ok {
 			m[val] = true
 			u = append(u, val)
 		}
 	}
-
 	return u
 }
 
 // FreqStrings returns a frequency map of the string slice provided
 func FreqStrings(input []string) map[string]int {
 	m := make(map[string]int)
-
 	for _, val := range input {
 		if _, ok := m[val]; !ok {
 			m[val] = 1
@@ -107,8 +109,19 @@ func FreqStrings(input []string) map[string]int {
 			m[val] = m[val] + 1
 		}
 	}
-
 	return m
+}
+
+// ToLinks returns a slice of Links from frequency map
+func ToLinks(input map[string]int) []Link {
+	arr := make([]Link, 0, len(input))
+	for key, val := range input {
+		arr = append(arr, Link{
+			Title: key,
+			Count: val,
+		})
+	}
+	return arr
 }
 
 func main() {
