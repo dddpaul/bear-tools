@@ -44,7 +44,7 @@ func NewNote(r io.Reader) *Note {
 		if tokens != nil {
 			tmp := tokens[:0]
 			for i, t := range tokens {
-				tokens[i] = strings.Replace(strings.TrimSpace(t), "#", "", 1)
+				tokens[i] = strings.Replace(strings.TrimSpace(t), "#", "", -1)
 				if len(tokens[i]) > 0 {
 					tmp = append(tmp, tokens[i])
 				}

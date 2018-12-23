@@ -70,6 +70,14 @@ func TestTagsInContent(t *testing.T) {
 `)).Tags, []string{"tag1", "tag2", "tag3", "tag4"})
 }
 
+
+func TestMultipleHashesAreNotTags(t *testing.T) {
+	assert.Equal(t, NewNote(strings.NewReader(`
+#tag1 ## ### #### #tag2 ##### #tag3
+`)).Tags, []string{"tag1", "tag2", "tag3"})
+}
+
+
 func TestLinks(t *testing.T) {
 	assert.Equal(t, NewNote(strings.NewReader(`
 # Title
