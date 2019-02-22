@@ -1,9 +1,13 @@
 package main
 
 import (
-	"github.com/magiconair/properties/assert"
+	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidTitle(t *testing.T) {
@@ -77,7 +81,7 @@ func TestMultipleHashesAreNotTags(t *testing.T) {
 }
 
 func TestLinks(t *testing.T) {
-	assert.Equal(t, NewNote(strings.NewReader(`
+	assert.ElementsMatch(t, NewNote(strings.NewReader(`
 # Title
 #tag
 What's difference between [[Thrift]] and [[GRPC]]
@@ -100,11 +104,32 @@ Empty Links [[]] should be ignored
 }
 
 func TestMarshal(t *testing.T) {
-	json, _ := NewNote(strings.NewReader(`
+	note, _ := NewNote(strings.NewReader(`
 	# Title
 	#tag1 #tag2
 	What's difference between [[Thrift]] and [[GRPC]]
 	Or between [[GRPC]] and [[Thrift]] and [[SOAP]]
 	`)).Marshal()
-	assert.Equal(t, json, `{"title":"","tags":["tag1","tag2"],"links":[{"title":"Thrift","count":2},{"title":"GRPC","count":2},{"title":"SOAP","count":1}]}`)
+
+	expected := `{"title":"","tags":["tag1","tag2"],"links":[{"title":"Thrift","count":2},{"title":"GRPC","count":2},{"title":"SOAP","count":1}]}`
+
+	ok, _ := AreEqualJSON(expected, note)
+	assert.True(t, ok)
+}
+
+func AreEqualJSON(s1, s2 string) (bool, error) {
+	var o1 interface{}
+	var o2 interface{}
+
+	var err error
+	err = json.Unmarshal([]byte(s1), &o1)
+	if err != nil {
+		return false, fmt.Errorf("error mashalling string 1 :: %s", err.Error())
+	}
+	err = json.Unmarshal([]byte(s2), &o2)
+	if err != nil {
+		return false, fmt.Errorf("error mashalling string 2 :: %s", err.Error())
+	}
+
+	return reflect.DeepEqual(o1, o2), nil
 }
