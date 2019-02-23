@@ -24,11 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-
-[[constraint]]
-  name = "github.com/magiconair/properties"
-  version = "1.8.0"
-
 [[constraint]]
   name = "github.com/urfave/cli"
   version = "1.20.0"
